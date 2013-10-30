@@ -44,7 +44,7 @@ class Player {
 
 ```cs
 [Serializable]
-public class Ball
+public partial class Ball
 {
 	public string id;
 	public double x;
@@ -67,7 +67,7 @@ public class Ball
 }
 
 [Serializable]
-public class Player
+public partial class Player
 {
 	public int id;
 	public string name;
