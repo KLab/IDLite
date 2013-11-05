@@ -5,9 +5,9 @@ _tabversion = '3.2'
 
 _lr_method = 'LALR'
 
-_lr_signature = b'\xb8\xcc\xa5m\x85\x9d\xc5\x0f:\t\x17G\xf0K\xd4\xeb'
+_lr_signature = '\xb5\xd9\x83M?-\x07\xf3,:\xb4E\x9e\xd6\r\x93'
     
-_lr_action_items = {'{':([5,],[6,]),'<':([12,],[14,]),'}':([6,7,8,10,13,17,],[-1,9,-4,-3,-5,-6,]),'>':([15,],[16,]),'CLASS':([0,1,2,3,9,],[-1,4,-8,-7,-2,]),'$end':([0,1,2,3,9,],[-1,0,-8,-7,-2,]),'ID':([4,6,7,8,10,11,13,14,16,17,],[5,-1,11,-4,-3,13,-5,15,17,-6,]),'LIST':([6,7,8,10,13,17,],[-1,12,-4,-3,-5,-6,]),}
+_lr_action_items = {'<':([9,],[14,]),'LIST':([6,7,8,11,15,18,],[-1,9,-4,-3,-7,-8,]),'CLASS':([0,1,2,3,13,],[-1,4,-10,-9,-2,]),'{':([5,],[6,]),'>':([17,],[19,]),'}':([6,7,8,11,15,18,],[-1,13,-4,-3,-7,-8,]),'ID':([4,6,7,8,10,11,12,14,15,16,18,19,],[5,-1,10,-4,-5,-3,15,17,-7,18,-8,-6,]),'?':([10,12,19,],[-5,16,-6,]),'$end':([0,1,2,3,13,],[-1,0,-10,-9,-2,]),}
 
 _lr_action = { }
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'spec':([0,],[1,]),'class':([1,],[3,]),'empty':([0,6,],[2,8,]),'fields':([6,],[7,]),'field':([7,],[10,]),}
+_lr_goto_items = {'fields':([6,],[7,]),'class':([1,],[3,]),'field':([7,],[11,]),'type':([7,],[12,]),'spec':([0,],[1,]),'empty':([0,6,],[2,8,]),}
 
 _lr_goto = { }
 for _k, _v in _lr_goto_items.items():
@@ -26,12 +26,14 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> spec","S'",1,None,None,None),
-  ('empty -> <empty>','empty',0,'p_empty','/home/methane/work/idlite/idlite/parser.py',40),
-  ('class -> CLASS ID { fields }','class',5,'p_class','/home/methane/work/idlite/idlite/parser.py',44),
-  ('fields -> fields field','fields',2,'p_fields','/home/methane/work/idlite/idlite/parser.py',49),
-  ('fields -> empty','fields',1,'p_fields','/home/methane/work/idlite/idlite/parser.py',50),
-  ('field -> ID ID','field',2,'p_field','/home/methane/work/idlite/idlite/parser.py',60),
-  ('field -> LIST < ID > ID','field',5,'p_field','/home/methane/work/idlite/idlite/parser.py',61),
-  ('spec -> spec class','spec',2,'p_spec','/home/methane/work/idlite/idlite/parser.py',71),
-  ('spec -> empty','spec',1,'p_spec','/home/methane/work/idlite/idlite/parser.py',72),
+  ('empty -> <empty>','empty',0,'p_empty','/home/methane/work/idlite/idlite/parser.py',42),
+  ('class -> CLASS ID { fields }','class',5,'p_class','/home/methane/work/idlite/idlite/parser.py',46),
+  ('fields -> fields field','fields',2,'p_fields','/home/methane/work/idlite/idlite/parser.py',51),
+  ('fields -> empty','fields',1,'p_fields','/home/methane/work/idlite/idlite/parser.py',52),
+  ('type -> ID','type',1,'p_type','/home/methane/work/idlite/idlite/parser.py',62),
+  ('type -> LIST < ID >','type',4,'p_type','/home/methane/work/idlite/idlite/parser.py',63),
+  ('field -> type ID','field',2,'p_field','/home/methane/work/idlite/idlite/parser.py',75),
+  ('field -> type ? ID','field',3,'p_field','/home/methane/work/idlite/idlite/parser.py',76),
+  ('spec -> spec class','spec',2,'p_spec','/home/methane/work/idlite/idlite/parser.py',87),
+  ('spec -> empty','spec',1,'p_spec','/home/methane/work/idlite/idlite/parser.py',88),
 ]

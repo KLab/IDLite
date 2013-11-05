@@ -6,6 +6,8 @@ from idlite.types import List, Object, Class, premitives
 def generate(spec, outdir):
     with open(os.path.join(outdir, "types.cs"), "w") as f:
         w = Writer(f)
+        w.writeln("using System;")
+        w.writeln('')
         for def_ in spec:
             generate_type(w, def_)
 
@@ -60,12 +62,12 @@ def cstype(t):
     if isinstance(t, str):
         if t == "float":
             return "double"
+        elif t == Object:
+            return "Dictionary<string, object>"
         else:
             return t
     elif isinstance(t, List):
         return "List<%s>" % (cstype(t.T),)
-    elif isinstance(t, Object):
-        return "Dictionary<string, %s>" % (cstype(t.type))
     elif isinstance(t, Class):
         return t.name
     else:
@@ -77,6 +79,7 @@ class FieldWrapper(object):
         self.name = field.name
         self.type = field.type
         self.cstype = cstype(field.type)
+        self.nullable = field.nullable
 
 
 def generate_type(w, t):
@@ -90,7 +93,13 @@ def generate_type(w, t):
             w.writeln("public {0.cstype} {0.name};", f)
         w.writeln('')
 
-        # Constructor
+        # Default Constructor
+        w.writeln("public {0}()", t.name)
+        w.writeln("{")
+        w.writeln("}")
+        w.writeln('')
+
+        # Handy Constructor
         args = ", ".join("{0.cstype} {0.name}".format(f) for f in fields)
         w.writeln("public {0}({1})", t.name, args)
         with w:
@@ -98,29 +107,31 @@ def generate_type(w, t):
                 w.writeln("this.{0.name} = {0.name};", f)
         w.writeln('')
 
-        # FromDict
-        w.writeln("public static {0} FromDict(Dictionary<string, object> dict)", t.name)
+        # From dict
+        w.writeln("public {0}(Dictionary<string, object> dict)", t.name)
         with w:
             for f in fields:
                 if f.type in premitives:
-                    w.writeln('var {0.name} = dict.GetValue<{0.cstype}>("{0.name}");', f)
+                    if f.nullable:
+                        w.writeln('dict.TryGetValue<{0.cstype}>("{0.name}", out this.{0.name});', f)
+                    else:
+                        w.writeln('{0.name} = dict.GetValue<{0.cstype}>("{0.name}");', f)
                 elif isinstance(f.type, List):
-                    w.writeln("var {0.name} = new {0.cstype}();", f)
+                    w.writeln("{0.name} = new {0.cstype}();", f)
                     w.writeln('foreach (var o in dict.GetValue<List<object>>("{0}"))', f.name)
                     with w:
                         if f.type.T in premitives:
                             w.writeln('{0}.Add(({1}o));', f.name, cstype(f.type.T))
+                        elif f.type.T == Object:
+                            w.writeln('{0}.Add((Dictionary<string, object>)o);', f.name)
                         else:
-                            w.writeln('{0}.Add({1}.FromDict((Dictionary<string, object>)o));',
+                            w.writeln('{0}.Add(new {1}((Dictionary<string, object>)o));',
                                       f.name, cstype(f.type.T))
                 elif f.type == Object:
-                    w.writeln('var {0} = dict.GetValue<Dictionary<string, object>>("{0}");',
+                    w.writeln('{0} = dict.GetValue<Dictionary<string, object>>("{0}");',
                               f.name)
                 else:
                     print("Unknwon type: ", repr(f.type))
-
-            w.writeln("return new {0}({1});",
-                      t.name, ', '.join(f.name for f in fields))
 
         #w.writeln('')
         # TODO: ToDict

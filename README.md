@@ -43,12 +43,18 @@ class Player {
 ### 生成されるコード
 
 ```cs
+using System;
+
 [Serializable]
 public partial class Ball
 {
 	public string id;
 	public double x;
 	public double y;
+
+	public Ball()
+	{
+	}
 
 	public Ball(string id, double x, double y)
 	{
@@ -57,12 +63,11 @@ public partial class Ball
 		this.y = y;
 	}
 
-	public static Ball FromDict(Dictionary<string, object> dict)
+	public Ball(Dictionary<string, object> dict)
 	{
-		var id = dict.GetValue<string>("id");
-		var x = dict.GetValue<double>("x");
-		var y = dict.GetValue<double>("y");
-		return new Ball(id, x, y);
+		id = dict.GetValue<string>("id");
+		x = dict.GetValue<double>("x");
+		y = dict.GetValue<double>("y");
 	}
 }
 
@@ -73,6 +78,10 @@ public partial class Player
 	public string name;
 	public List<Ball> balls;
 
+	public Player()
+	{
+	}
+
 	public Player(int id, string name, List<Ball> balls)
 	{
 		this.id = id;
@@ -80,16 +89,15 @@ public partial class Player
 		this.balls = balls;
 	}
 
-	public static Player FromDict(Dictionary<string, object> dict)
+	public Player(Dictionary<string, object> dict)
 	{
-		var id = dict.GetValue<int>("id");
-		var name = dict.GetValue<string>("name");
-		var balls = new List<Ball>();
+		id = dict.GetValue<int>("id");
+		name = dict.GetValue<string>("name");
+		balls = new List<Ball>();
 		foreach (var o in dict.GetValue<List<object>>("balls"))
 		{
-			balls.Add(Ball.FromDict((Dictionary<string, object>)o));
+			balls.Add(new Ball((Dictionary<string, object>)o));
 		}
-		return new Player(id, name, balls);
 	}
 }
 

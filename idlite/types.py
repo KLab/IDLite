@@ -1,11 +1,11 @@
 from collections import namedtuple
 
 Class = namedtuple('Class', 'name fields')
-Field = namedtuple('Field', 'type name')
+Field = namedtuple('Field', 'type name nullable')
 
 # Generic types
 List = namedtuple('List', 'T')
-Object = "Object"
+Object = "object"
 
 # Premitive types
 premitives = [

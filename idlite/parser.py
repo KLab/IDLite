@@ -4,6 +4,8 @@ __DIR__ = os.path.abspath(os.path.dirname(__file__))
 from .types import Class, Field, List
 from ply import lex, yacc
 
+DEBUG = 0
+
 reserved = {
     'class': 'CLASS',
     'List': 'LIST',
@@ -14,7 +16,7 @@ tokens = [
 ] + list(reserved.values())
 
 
-literals = '{}:<>'
+literals = '{}:<>?'
 
 t_ignore = ' \t'
 
@@ -55,15 +57,29 @@ def p_fields(p):
         p[0] = p[1] + [p[2]]
 
 
+def p_type(p):
+    """
+    type : ID
+         | LIST '<' ID '>'
+    """
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        # Recursive type is not supported for now.
+        assert len(p) == 5
+        p[0] = List(p[3])
+
+
 def p_field(p):
     """
-    field : ID ID
-          | LIST '<' ID '>' ID
+    field : type ID
+          | type '?' ID
     """
-    if p[1] == 'List':
-        p[0] = Field(List(p[3]), p[5])
+    if len(p) == 3:  # not nullable
+        p[0] = Field(p[1], p[2], False)
     else:
-        p[0] = Field(p[1], p[2])
+        assert len(p) == 4  # nullable
+        p[0] = Field(p[1], p[3], True)
 
 
 def p_spec(p):
@@ -77,6 +93,10 @@ def p_spec(p):
         p[0] = p[1] + [p[2]]
 
 
+def p_error(p):
+    raise Exception(str(p))
+
+
 start = 'spec'
-lexer = lex.lex()
-parser = yacc.yacc(outputdir=__DIR__)
+lexer = lex.lex(debug=DEBUG)
+parser = yacc.yacc(outputdir=__DIR__, debug=DEBUG)
