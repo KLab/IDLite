@@ -7,6 +7,7 @@ def generate(spec, outdir):
     with open(os.path.join(outdir, "types.cs"), "w") as f:
         w = Writer(f)
         w.writeln("using System;")
+        w.writeln("using System.Collections.Generic;")
         w.writeln('')
         for def_ in spec:
             generate_type(w, def_)
