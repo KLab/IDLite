@@ -4,6 +4,7 @@ class Ball {
     string id
     float x  # x座標.
     float y
+    int? z
 }
 
 class Player {

@@ -1,16 +1,16 @@
-import os
+import sys
 
 from idlite.types import List, Object, Class, premitives
 
 
 def generate(spec, outdir):
-    with open(os.path.join(outdir, "types.cs"), "w") as f:
-        w = Writer(f)
-        w.writeln("using System;")
-        w.writeln("using System.Collections.Generic;")
-        w.writeln('')
-        for def_ in spec:
-            generate_type(w, def_)
+    w = Writer(sys.stdout)
+    w.writeln("using System;")
+    w.writeln("using System.Collections.Generic;")
+    w.writeln("using UnityEngine;")
+    w.writeln('')
+    for def_ in spec:
+        generate_type(w, def_)
 
 
 class Writer(object):
@@ -94,12 +94,6 @@ def generate_type(w, t):
             w.writeln("public {0.cstype} {0.name};", f)
         w.writeln('')
 
-        # Default Constructor
-        w.writeln("public {0}()", t.name)
-        w.writeln("{")
-        w.writeln("}")
-        w.writeln('')
-
         # Handy Constructor
         args = ", ".join("{0.cstype} {0.name}".format(f) for f in fields)
         w.writeln("public {0}({1})", t.name, args)
@@ -111,26 +105,31 @@ def generate_type(w, t):
         # From dict
         w.writeln("public {0}(Dictionary<string, object> dict)", t.name)
         with w:
+            w.writeln("object _o;");
             for f in fields:
                 if f.type in premitives:
-                    if f.nullable:
-                        w.writeln('dict.TryGetValue<{0.cstype}>("{0.name}", out this.{0.name});', f)
-                    else:
-                        w.writeln('{0.name} = dict.GetValue<{0.cstype}>("{0.name}");', f)
+                    w.writeln('if (dict.TryGetValue("{0.name}", out _o))', f)
+                    with w:
+                        w.writeln('{0.name} = ({0.cstype})_o;', f)
+                    if not f.nullable:
+                        w.writeln('else')
+                        with w:
+                            w.writeln('Debug.Log("{0.name} not found");', f)
                 elif isinstance(f.type, List):
                     w.writeln("{0.name} = new {0.cstype}();", f)
-                    w.writeln('foreach (var o in dict.GetValue<List<object>>("{0}"))', f.name)
+                    w.writeln('if (dict.TryGetValue("{0.name}", out _o))', f)
                     with w:
-                        if f.type.T in premitives:
-                            w.writeln('{0}.Add(({1}o));', f.name, cstype(f.type.T))
-                        elif f.type.T == Object:
-                            w.writeln('{0}.Add((Dictionary<string, object>)o);', f.name)
-                        else:
-                            w.writeln('{0}.Add(new {1}((Dictionary<string, object>)o));',
-                                      f.name, cstype(f.type.T))
+                        w.writeln('foreach (var _v in (List<object>)_o)')
+                        with w:
+                            if f.type.T in premitives:
+                                w.writeln('{0}.Add(({1})_v);', f.name, cstype(f.type.T))
+                            elif f.type.T == Object:
+                                w.writeln('{0}.Add((Dictionary<string, object>)_v);', f.name)
+                            else:
+                                w.writeln('{0}.Add(new {1}((Dictionary<string, object>)_v));',
+                                          f.name, cstype(f.type.T))
                 elif f.type == Object:
-                    w.writeln('{0} = dict.GetValue<Dictionary<string, object>>("{0}");',
-                              f.name)
+                    w.writeln('dict.TryGetValue("{0.name}", out {0.name});', f)
                 else:
                     print("Unknwon type: ", repr(f.type))
 
