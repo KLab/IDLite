@@ -31,12 +31,15 @@ class Ball {
     string id
     float x  # x座標.
     float y
+    int? z
+    object obj
+    List<object> objects
 }
 
 class Player {
     int id
     string name
-    List<Ball> balls  # List<T> は、 JSON の [] の各要素を、T に deserialize します.
+    List<Ball> balls  # List<T> は JSON の [] に割り当てられますが、その要素が T にパースされます.
 }
 ```
 
@@ -44,6 +47,8 @@ class Player {
 
 ```cs
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public partial class Ball
@@ -51,23 +56,60 @@ public partial class Ball
 	public string id;
 	public double x;
 	public double y;
+	public int z;
+	public Dictionary<string, object> obj;
+	public List<Dictionary<string, object>> objects;
 
-	public Ball()
-	{
-	}
-
-	public Ball(string id, double x, double y)
+	public Ball(string id, double x, double y, int z, Dictionary<string, object> obj, List<Dictionary<string, object>> objects)
 	{
 		this.id = id;
 		this.x = x;
 		this.y = y;
+		this.z = z;
+		this.obj = obj;
+		this.objects = objects;
 	}
 
 	public Ball(Dictionary<string, object> dict)
 	{
-		id = dict.GetValue<string>("id");
-		x = dict.GetValue<double>("x");
-		y = dict.GetValue<double>("y");
+		object _o;
+		if (dict.TryGetValue("id", out _o))
+		{
+			id = (string)_o;
+		}
+		else
+		{
+			Debug.Log("id not found");
+		}
+		if (dict.TryGetValue("x", out _o))
+		{
+			x = (double)_o;
+		}
+		else
+		{
+			Debug.Log("x not found");
+		}
+		if (dict.TryGetValue("y", out _o))
+		{
+			y = (double)_o;
+		}
+		else
+		{
+			Debug.Log("y not found");
+		}
+		if (dict.TryGetValue("z", out _o))
+		{
+			z = (int)_o;
+		}
+		dict.TryGetValue("obj", out obj);
+		objects = new List<Dictionary<string, object>>();
+		if (dict.TryGetValue("objects", out _o))
+		{
+			foreach (var _v in (List<object>)_o)
+			{
+				objects.Add((Dictionary<string, object>)_v);
+			}
+		}
 	}
 }
 
@@ -78,10 +120,6 @@ public partial class Player
 	public string name;
 	public List<Ball> balls;
 
-	public Player()
-	{
-	}
-
 	public Player(int id, string name, List<Ball> balls)
 	{
 		this.id = id;
@@ -91,14 +129,31 @@ public partial class Player
 
 	public Player(Dictionary<string, object> dict)
 	{
-		id = dict.GetValue<int>("id");
-		name = dict.GetValue<string>("name");
-		balls = new List<Ball>();
-		foreach (var o in dict.GetValue<List<object>>("balls"))
+		object _o;
+		if (dict.TryGetValue("id", out _o))
 		{
-			balls.Add(new Ball((Dictionary<string, object>)o));
+			id = (int)_o;
+		}
+		else
+		{
+			Debug.Log("id not found");
+		}
+		if (dict.TryGetValue("name", out _o))
+		{
+			name = (string)_o;
+		}
+		else
+		{
+			Debug.Log("name not found");
+		}
+		balls = new List<Ball>();
+		if (dict.TryGetValue("balls", out _o))
+		{
+			foreach (var _v in (List<object>)_o)
+			{
+				balls.Add(new Ball((Dictionary<string, object>)_v));
+			}
 		}
 	}
 }
-
 ```
