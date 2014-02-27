@@ -5,6 +5,8 @@ from idlite.types import List, Object, Class, premitives
 
 def generate(spec, outdir):
     w = Writer(sys.stdout)
+    w.writeln("// This code is automatically generated.")
+    w.writeln("// Don't edit this file directly.")
     w.writeln("using System;")
     w.writeln("using System.Collections.Generic;")
     w.writeln("using UnityEngine;")
