@@ -1,7 +1,8 @@
+from __future__ import absolute_import, division, print_function
 import sys
 
 from idlite.parser import parser
-from idlite.unitygen import generate
+from idlite import unitygen, idlitegen
 
 
 def main():
@@ -15,4 +16,4 @@ def main():
     #for t in spec:
     #    print(t)
 
-    generate(spec, '.')
+    unitygen.generate(spec, sys.stdout)
