@@ -32,8 +32,6 @@ class Ball {
     float x  # x座標.
     float y
     int? z
-    object obj
-    List<object> objects
 }
 
 class Player {
