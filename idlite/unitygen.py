@@ -1,9 +1,11 @@
+from __future__ import absolute_import, division, print_function
 import sys
 
 from idlite.types import List, Object, Class, Enum
 
-def generate(spec, outdir):
-    w = Writer(sys.stdout)
+
+def generate(spec, out):
+    w = Writer(out)
     w.writeln("// This code is automatically generated.")
     w.writeln("// Don't edit this file directly.")
     w.writeln("using System;")
