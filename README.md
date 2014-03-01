@@ -25,20 +25,21 @@ IDLite は、この隙間の需要を満たすためのものです。
 ### IDL
 
 ```
-# コメントは無視されます。 (TODO: コメントをコード生成に反映させる)
-# ボール
-class Ball {
-    string id
-    float x  # x座標.
-    float y
-    int? z
-}
+// コメントは無視されます。 (TODO: コメントをコード生成に反映させる)
+// ボール
 
-class Player {
-    int id
-    string name
-    List<Ball> balls  # List<T> は JSON の [] に割り当てられますが、その要素が T にパースされます.
-}
+enum Color {
+    red = 1,
+    green = 2,
+    blue = 3
+};
+
+class Ball {
+    string owner;
+    enum Color color;
+    float x; # x座標.
+    float y;
+};
 ```
 
 ### 生成されるコード
@@ -51,50 +52,35 @@ using System.Collections.Generic;
 
 namespace IDLite
 {
+	public enum Color
+	{
+		red = 1,
+		green = 2,
+		blue = 3
+	}
+
 	[Serializable]
 	public class Ball : IDLiteBase
 	{
-		public string id;
+		public string owner;
+		public Color color;
 		public double x;
 		public double y;
-		public int? z;
 
-		public Ball(string id, double x, double y, int? z)
+		public Ball(string owner, Color color, double x, double y)
 		{
-			this.id = id;
+			this.owner = owner;
+			this.color = color;
 			this.x = x;
 			this.y = y;
-			this.z = z;
 		}
 
 		public Ball(Dictionary<string, object> dict)
 		{
-			this.id = ToString(GetItem(dict, "id"));
+			this.owner = ToString(GetItem(dict, "owner"));
+			this.color = (Color)ToInt(GetItem(dict, "color"));
 			this.x = ToDouble(GetItem(dict, "x"));
 			this.y = ToDouble(GetItem(dict, "y"));
-			this.z = ToNullableInt(GetItem(dict, "z"));
-		}
-	}
-
-	[Serializable]
-	public class Player : IDLiteBase
-	{
-		public int id;
-		public string name;
-		public List<Ball> balls;
-
-		public Player(int id, string name, List<Ball> balls)
-		{
-			this.id = id;
-			this.name = name;
-			this.balls = balls;
-		}
-
-		public Player(Dictionary<string, object> dict)
-		{
-			this.id = ToInt(GetItem(dict, "id"));
-			this.name = ToString(GetItem(dict, "name"));
-			this.balls = GetList<Ball>(dict, "balls", (object o) => { return new Ball((Dictionary<string, object>)o); });
 		}
 	}
 
