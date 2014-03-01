@@ -83,7 +83,6 @@ def p_field(p):
           | type '?' ID ';'
           | ENUM ID ID ';'
     """
-    print("field: ", list(p))
     if len(p) == 4:  # not nullable
         p[0] = Field(p[1], p[2], False, False)
     elif len(p) == 5:

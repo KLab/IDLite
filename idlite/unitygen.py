@@ -84,7 +84,7 @@ def cstype(t, nullable):
         raise ValueError("Unknown type: " + repr(t))
 
 
-def get_value(expr, type_name, nullable):
+def get_value(expr, type_name, nullable, enum=False):
     if type_name in ['int', 'long', 'string', 'float', 'bool']:
         #: :type: string
         t = type_name
@@ -95,6 +95,8 @@ def get_value(expr, type_name, nullable):
             t[0].upper() + t[1:],
             expr
         )
+    elif enum:
+        return "(%s)ToInt(%s)" % (type_name, expr)
     else:
         return 'new %s((Dictionary<string, object>)%s)' % (type_name, expr)
 
@@ -104,6 +106,7 @@ class FieldWrapper(object):
         self.type = field.type
         self.cstype = cstype(field.type, field.nullable)
         self.nullable = field.nullable
+        self.enum = field.enum
 
 
 def generate_type(w, t):
@@ -142,14 +145,11 @@ def generate_type(w, t):
                 else:
                     e = get_value(
                         'GetItem(dict, "%s")' % f.name,
-                        f.type,
-                        f.nullable
-                    )
+                        f.type, f.nullable, f.enum)
                 w.writeln('this.{0.name} = {1};', f, e)
 
         #w.writeln('')
         # TODO: ToDict
-
     w.writeln('')
 
 
@@ -161,3 +161,4 @@ def generate_enum(w, E):
     with w:
         sep = ',\n' + '\t' * w.indent
         w.writeln(sep.join("%s = %s" % v for v in values))
+    w.writeln('')
