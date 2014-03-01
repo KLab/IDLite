@@ -1,31 +1,38 @@
 import os
 __DIR__ = os.path.abspath(os.path.dirname(__file__))
 
-from .types import Class, Field, List
+from .types import Class, Field, List, Enum
 from ply import lex, yacc
 
 DEBUG = 0
 
 reserved = {
     'class': 'CLASS',
+    'enum': 'ENUM',
     'List': 'LIST',
 }
 
 tokens = [
-    'ID',
+    'ID', 'NUMBER',
 ] + list(reserved.values())
 
 
-literals = '{}:<>?'
+literals = '{}:<>?=,'
 
 t_ignore = ' \t'
 
-t_ignore_COMMENT = r'\#.*'
+t_ignore_COMMENT = r'(\#|//).*'
 
 
 def t_ID(t):
     r'[A-Za-z_][A-Za-z0-9_]*'
     t.type = reserved.get(t.value, 'ID')
+    return t
+
+
+def t_NUMBER(t):
+    r'[0-9]+'
+    t.value = int(t.value)
     return t
 
 
@@ -82,9 +89,33 @@ def p_field(p):
         p[0] = Field(p[1], p[3], True)
 
 
+def p_enum(p):
+    """
+    enum : ENUM ID '{' enum_values '}'
+    """
+    p[0] = Enum(p[2], p[4])
+
+def p_enum_values(p):
+    """
+    enum_values : enum_values ',' enum_value
+                | enum_value
+    """
+    if len(p) == 4:
+        p[0] = p[1] + [p[3]]
+    elif len(p) == 2:
+        p[0] = [p[1]]
+
+
+def p_enum_value(p):
+    """
+    enum_value : ID '=' NUMBER
+    """
+    p[0] = (p[1], p[3])  # (id, number)
+
 def p_spec(p):
     """
     spec : spec class
+         | spec enum
          | empty
     """
     if len(p) == 2:

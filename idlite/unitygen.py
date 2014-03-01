@@ -1,6 +1,6 @@
 import sys
 
-from idlite.types import List, Object, Class
+from idlite.types import List, Object, Class, Enum
 
 def generate(spec, outdir):
     w = Writer(sys.stdout)
@@ -12,7 +12,12 @@ def generate(spec, outdir):
     w.writeln('namespace IDLite')
     with w:
         for def_ in spec:
-            generate_type(w, def_)
+            if isinstance(def_, Class):
+                generate_type(w, def_)
+            elif isinstance(def_, Enum):
+                generate_enum(w, def_)
+            else:
+                raise ValueError("Can't generater for %s" % (def_,))
 
 
 class Writer(object):
@@ -146,3 +151,13 @@ def generate_type(w, t):
         # TODO: ToDict
 
     w.writeln('')
+
+
+def generate_enum(w, E):
+    name = E.name
+    values = E.values
+
+    w.writeln("public enum {0}", name)
+    with w:
+        sep = ',\n' + '\t' * w.indent
+        w.writeln(sep.join("%s = %s" % v for v in values))
