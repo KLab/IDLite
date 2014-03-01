@@ -1,7 +1,6 @@
 import sys
 
-from idlite.types import List, Object, Class, premitives
-
+from idlite.types import List, Object, Class
 
 def generate(spec, outdir):
     w = Writer(sys.stdout)
@@ -9,10 +8,11 @@ def generate(spec, outdir):
     w.writeln("// Don't edit this file directly.")
     w.writeln("using System;")
     w.writeln("using System.Collections.Generic;")
-    w.writeln("using UnityEngine;")
     w.writeln('')
-    for def_ in spec:
-        generate_type(w, def_)
+    w.writeln('namespace IDLite')
+    with w:
+        for def_ in spec:
+            generate_type(w, def_)
 
 
 class Writer(object):
@@ -61,27 +61,43 @@ class Writer(object):
         self.exit()
 
 
-def cstype(t):
+def cstype(t, nullable):
     if isinstance(t, str):
         if t == "float":
-            return "double"
+            return "double?" if nullable else "double"
+        elif t in ["int", "long", "bool"]:
+            return t + "?" if nullable else t
         elif t == Object:
             return "Dictionary<string, object>"
         else:
             return t
     elif isinstance(t, List):
-        return "List<%s>" % (cstype(t.T),)
+        return "List<%s>" % (cstype(t.T, False))
     elif isinstance(t, Class):
         return t.name
     else:
         raise ValueError("Unknown type: " + repr(t))
 
 
+def get_value(expr, type_name, nullable):
+    if type_name in ['int', 'long', 'string', 'float', 'bool']:
+        #: :type: string
+        t = type_name
+        if t == 'float':
+            t = 'double'
+        return 'To%s%s(%s)' % (
+            'Nullable' if nullable else '',
+            t[0].upper() + t[1:],
+            expr
+        )
+    else:
+        return 'new %s((Dictionary<string, object>)%s)' % (type_name, expr)
+
 class FieldWrapper(object):
     def __init__(self, field):
         self.name = field.name
         self.type = field.type
-        self.cstype = cstype(field.type)
+        self.cstype = cstype(field.type, field.nullable)
         self.nullable = field.nullable
 
 
@@ -89,7 +105,7 @@ def generate_type(w, t):
     fields = list(map(FieldWrapper, t.fields))
     # Begin
     w.writeln("[Serializable]")
-    w.writeln("public partial class " + t.name)
+    w.writeln("public class " + t.name + " : IDLiteBase")
     with w:
         # Field declaration
         for f in fields:
@@ -107,33 +123,24 @@ def generate_type(w, t):
         # From dict
         w.writeln("public {0}(Dictionary<string, object> dict)", t.name)
         with w:
-            w.writeln("object _o;");
             for f in fields:
-                if f.type in premitives:
-                    w.writeln('if (dict.TryGetValue("{0.name}", out _o))', f)
-                    with w:
-                        w.writeln('{0.name} = ({0.cstype})_o;', f)
-                    if not f.nullable:
-                        w.writeln('else')
-                        with w:
-                            w.writeln('Debug.Log("{0.name} not found");', f)
-                elif isinstance(f.type, List):
-                    w.writeln("{0.name} = new {0.cstype}();", f)
-                    w.writeln('if (dict.TryGetValue("{0.name}", out _o))', f)
-                    with w:
-                        w.writeln('foreach (var _v in (List<object>)_o)')
-                        with w:
-                            if f.type.T in premitives:
-                                w.writeln('{0}.Add(({1})_v);', f.name, cstype(f.type.T))
-                            elif f.type.T == Object:
-                                w.writeln('{0}.Add((Dictionary<string, object>)_v);', f.name)
-                            else:
-                                w.writeln('{0}.Add(new {1}((Dictionary<string, object>)_v));',
-                                          f.name, cstype(f.type.T))
-                elif f.type == Object:
-                    w.writeln('dict.TryGetValue("{0.name}", out {0.name});', f)
+                if isinstance(f.type, List):
+                    e = 'GetList<%s>(dict, "%s", (object o) => { return %s; })' % (
+                        cstype(f.type.T, False),
+                        f.name,
+                        get_value(
+                            'o',
+                            f.type.T,
+                            False
+                        )
+                    )
                 else:
-                    print("Unknwon type: ", repr(f.type))
+                    e = get_value(
+                        'GetItem(dict, "%s")' % f.name,
+                        f.type,
+                        f.nullable
+                    )
+                w.writeln('this.{0.name} = {1};', f, e)
 
         #w.writeln('')
         # TODO: ToDict
