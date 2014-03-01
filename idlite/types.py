@@ -6,10 +6,3 @@ Field = namedtuple('Field', 'type name nullable')
 # Generic types
 List = namedtuple('List', 'T')
 Object = "object"
-
-# Premitive types
-premitives = [
-    "bool",
-    "string",
-    "float",
-    "int"]

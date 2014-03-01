@@ -32,8 +32,6 @@ class Ball {
     float x  # x座標.
     float y
     int? z
-    object obj
-    List<object> objects
 }
 
 class Player {
@@ -46,114 +44,59 @@ class Player {
 ### 生成されるコード
 
 ```cs
+// This code is automatically generated.
+// Don't edit this file directly.
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-[Serializable]
-public partial class Ball
+namespace IDLite
 {
-	public string id;
-	public double x;
-	public double y;
-	public int z;
-	public Dictionary<string, object> obj;
-	public List<Dictionary<string, object>> objects;
-
-	public Ball(string id, double x, double y, int z, Dictionary<string, object> obj, List<Dictionary<string, object>> objects)
+	[Serializable]
+	public class Ball : IDLiteBase
 	{
-		this.id = id;
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.obj = obj;
-		this.objects = objects;
+		public string id;
+		public double x;
+		public double y;
+		public int? z;
+
+		public Ball(string id, double x, double y, int? z)
+		{
+			this.id = id;
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+
+		public Ball(Dictionary<string, object> dict)
+		{
+			this.id = ToString(GetItem(dict, "id"));
+			this.x = ToDouble(GetItem(dict, "x"));
+			this.y = ToDouble(GetItem(dict, "y"));
+			this.z = ToNullableInt(GetItem(dict, "z"));
+		}
 	}
 
-	public Ball(Dictionary<string, object> dict)
+	[Serializable]
+	public class Player : IDLiteBase
 	{
-		object _o;
-		if (dict.TryGetValue("id", out _o))
+		public int id;
+		public string name;
+		public List<Ball> balls;
+
+		public Player(int id, string name, List<Ball> balls)
 		{
-			id = (string)_o;
+			this.id = id;
+			this.name = name;
+			this.balls = balls;
 		}
-		else
+
+		public Player(Dictionary<string, object> dict)
 		{
-			Debug.Log("id not found");
-		}
-		if (dict.TryGetValue("x", out _o))
-		{
-			x = (double)_o;
-		}
-		else
-		{
-			Debug.Log("x not found");
-		}
-		if (dict.TryGetValue("y", out _o))
-		{
-			y = (double)_o;
-		}
-		else
-		{
-			Debug.Log("y not found");
-		}
-		if (dict.TryGetValue("z", out _o))
-		{
-			z = (int)_o;
-		}
-		dict.TryGetValue("obj", out obj);
-		objects = new List<Dictionary<string, object>>();
-		if (dict.TryGetValue("objects", out _o))
-		{
-			foreach (var _v in (List<object>)_o)
-			{
-				objects.Add((Dictionary<string, object>)_v);
-			}
+			this.id = ToInt(GetItem(dict, "id"));
+			this.name = ToString(GetItem(dict, "name"));
+			this.balls = GetList<Ball>(dict, "balls", (object o) => { return new Ball((Dictionary<string, object>)o); });
 		}
 	}
-}
 
-[Serializable]
-public partial class Player
-{
-	public int id;
-	public string name;
-	public List<Ball> balls;
-
-	public Player(int id, string name, List<Ball> balls)
-	{
-		this.id = id;
-		this.name = name;
-		this.balls = balls;
-	}
-
-	public Player(Dictionary<string, object> dict)
-	{
-		object _o;
-		if (dict.TryGetValue("id", out _o))
-		{
-			id = (int)_o;
-		}
-		else
-		{
-			Debug.Log("id not found");
-		}
-		if (dict.TryGetValue("name", out _o))
-		{
-			name = (string)_o;
-		}
-		else
-		{
-			Debug.Log("name not found");
-		}
-		balls = new List<Ball>();
-		if (dict.TryGetValue("balls", out _o))
-		{
-			foreach (var _v in (List<object>)_o)
-			{
-				balls.Add(new Ball((Dictionary<string, object>)_v));
-			}
-		}
-	}
 }
 ```
