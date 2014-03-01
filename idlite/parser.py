@@ -17,7 +17,7 @@ tokens = [
 ] + list(reserved.values())
 
 
-literals = '{}:<>?=,'
+literals = '{}:<>?=,;'
 
 t_ignore = ' \t'
 
@@ -50,7 +50,7 @@ def p_empty(p):
 
 
 def p_class(p):
-    "class : CLASS ID '{' fields '}'"
+    "class : CLASS ID '{' fields '}' ';'"
     p[0] = Class(p[2], p[4])
 
 
@@ -79,21 +79,28 @@ def p_type(p):
 
 def p_field(p):
     """
-    field : type ID
-          | type '?' ID
+    field : type ID ';'
+          | type '?' ID ';'
+          | ENUM ID ID ';'
     """
-    if len(p) == 3:  # not nullable
-        p[0] = Field(p[1], p[2], False)
+    print("field: ", list(p))
+    if len(p) == 4:  # not nullable
+        p[0] = Field(p[1], p[2], False, False)
+    elif len(p) == 5:
+        if p[2] == '?':
+            p[0] = Field(p[1], p[3], True, False)
+        else:
+            p[0] = Field(p[2], p[3], False, True)
     else:
-        assert len(p) == 4  # nullable
-        p[0] = Field(p[1], p[3], True)
+        raise Exception
 
 
 def p_enum(p):
     """
-    enum : ENUM ID '{' enum_values '}'
+    enum : ENUM ID '{' enum_values '}' ';'
     """
     p[0] = Enum(p[2], p[4])
+
 
 def p_enum_values(p):
     """
