@@ -1,14 +1,15 @@
-# コメントは無視されます。 (TODO: コメントをコード生成に反映させる)
-# ボール
-class Ball {
-    string id
-    float x  # x座標.
-    float y
-    int? z
-}
+// コメントは無視されます。 (TODO: コメントをコード生成に反映させる)
+// ボール
 
-class Player {
-    int id
-    string name
-    List<Ball> balls  # List<T> は JSON の [] に割り当てられますが、その要素が T にパースされます.
-}
+enum Color {
+    red = 1,
+    green = 2,
+    blue = 3
+};
+
+class Ball {
+    string owner;
+    enum Color color;
+    float x; # x座標.
+    float y;
+};
