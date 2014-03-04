@@ -13,7 +13,7 @@ reserved = {
 }
 
 tokens = [
-    'ID', 'NUMBER',
+    'ID', 'NUMBER', 'COMMENT',
 ] + list(reserved.values())
 
 
@@ -21,7 +21,13 @@ literals = '{}:<>?=,;'
 
 t_ignore = ' \t'
 
-t_ignore_COMMENT = r'(\#|//).*'
+t_ignore_XCOMMENT = r'\#.*'
+
+
+def t_COMMENT(t):
+    r'//.*'
+    t.value = t.value[2:]
+    return t
 
 
 def t_ID(t):
@@ -48,10 +54,30 @@ def t_error(t):
 def p_empty(p):
     "empty :"
 
+def p_document(p):
+    """
+    document : COMMENT
+             | COMMENT COMMENT
+    """
+    if len(p) == 2:
+        p[0] = p[1]
+    elif len(p) == 3:
+        p[0] = p[1] + '\n' + p[2]
+    print(p[0])
+
 
 def p_class(p):
-    "class : CLASS ID '{' fields '}' ';'"
-    p[0] = Class(p[2], p[4])
+    """
+    class : document class
+          | CLASS ID '{' fields '}' ';'
+    """
+    print(list(p))
+    if len(p) == 3:
+        cls = p[2]
+        p[0] = cls._replace(doc=p[1])
+    else:
+        p[0] = Class(p[2], None, p[4])
+    print(p[0])
 
 
 def p_fields(p):

@@ -113,6 +113,11 @@ class FieldWrapper(object):
 
 def generate_type(w, t):
     fields = list(map(FieldWrapper, t.fields))
+    if t.doc:
+        w.writeln("/// <summary>")
+        for L in t.doc.splitlines():
+            w.writeln("///"+ L)
+        w.writeln("/// </summary>")
     # Begin
     w.writeln("[Serializable]")
     w.writeln("public partial class " + t.name + " : IDLiteBase")

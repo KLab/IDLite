@@ -1,12 +1,13 @@
-// コメントは無視されます。 (TODO: コメントをコード生成に反映させる)
-// ボール
-
 enum Color {
     red = 1,
     green = 2,
     blue = 3
 };
 
+# 無視されるコメント
+
+// ドキュメントコメント
+// 複数行書けます.
 class Ball {
     string owner;
     enum Color color;
