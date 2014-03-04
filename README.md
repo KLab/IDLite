@@ -25,17 +25,19 @@ IDLite は、この隙間の需要を満たすためのものです。
 ### IDL
 
 ```cpp
-// コメントは無視されます。 (TODO: コメントをコード生成に反映させる)
-// ボール
-
+// ドキュメントコメント
+// 複数行書けます.
 enum Color {
     red = 1,
     green = 2,
     blue = 3
 };
 
+# 無視されるコメント
+
+// ボール
 class Ball {
-    string owner;
+    string? owner;
     enum Color color;
     float x; # x座標.
     float y;
@@ -56,6 +58,10 @@ using System.Collections.Generic;
 
 namespace IDLite
 {
+	/// <summary>
+	/// ドキュメントコメント
+	/// 複数行書けます.
+	/// </summary>
 	public enum Color
 	{
 		red = 1,
@@ -63,8 +69,11 @@ namespace IDLite
 		blue = 3
 	}
 
+	/// <summary>
+	/// ボール
+	/// </summary>
 	[Serializable]
-	public class Ball : IDLiteBase
+	public partial class Ball : IDLiteBase
 	{
 		public string owner;
 		public Color color;
@@ -81,7 +90,7 @@ namespace IDLite
 
 		public Ball(Dictionary<string, object> dict)
 		{
-			this.owner = ToString(GetItem(dict, "owner"));
+			this.owner = ToNullableString(GetItem(dict, "owner"));
 			this.color = (Color)ToInt(GetItem(dict, "color"));
 			this.x = ToDouble(GetItem(dict, "x"));
 			this.y = ToDouble(GetItem(dict, "y"));
@@ -89,7 +98,7 @@ namespace IDLite
 	}
 
 	[Serializable]
-	public class Field : IDLiteBase
+	public partial class Field : IDLiteBase
 	{
 		public List<Ball> balls;
 
