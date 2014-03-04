@@ -1,19 +1,26 @@
 from __future__ import absolute_import, division, print_function
+import argparse
 import sys
 
 from idlite.parser import parser
 from idlite import unitygen, idlitegen
 
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--namespace', default='IDLite')
+    parser.add_argument('files', nargs='+')
+    return parser.parse_args()
+
 def main():
-    files = sys.argv[1:]
+    args = parse_args()
+    print(args.namespace)
+    print(args.files)
+
     spec = []
-    for fn in files:
+    for fn in args.files:
         with open(fn) as f:
             spec += parser.parse(f.read())
             parser.restart()
 
-    #for t in spec:
-    #    print(t)
-
-    unitygen.generate(spec, sys.stdout)
+    unitygen.generate(spec, sys.stdout, args.namespace)

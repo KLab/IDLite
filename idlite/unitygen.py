@@ -4,14 +4,14 @@ import sys
 from idlite.types import List, Object, Class, Enum
 
 
-def generate(spec, out):
+def generate(spec, out, namespace):
     w = Writer(out)
     w.writeln("// This code is automatically generated.")
     w.writeln("// Don't edit this file directly.")
     w.writeln("using System;")
     w.writeln("using System.Collections.Generic;")
     w.writeln('')
-    w.writeln('namespace IDLite')
+    w.writeln('namespace %s' % namespace)
     with w:
         for def_ in spec:
             if isinstance(def_, Class):
