@@ -13,3 +13,7 @@ class Ball {
     float x; # x座標.
     float y;
 };
+
+class Field {
+    List<Ball> balls;
+};

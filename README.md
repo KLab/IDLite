@@ -24,7 +24,7 @@ IDLite は、この隙間の需要を満たすためのものです。
 
 ### IDL
 
-```
+```cpp
 // コメントは無視されます。 (TODO: コメントをコード生成に反映させる)
 // ボール
 
@@ -39,6 +39,10 @@ class Ball {
     enum Color color;
     float x; # x座標.
     float y;
+};
+
+class Field {
+    List<Ball> balls;
 };
 ```
 
@@ -81,6 +85,22 @@ namespace IDLite
 			this.color = (Color)ToInt(GetItem(dict, "color"));
 			this.x = ToDouble(GetItem(dict, "x"));
 			this.y = ToDouble(GetItem(dict, "y"));
+		}
+	}
+
+	[Serializable]
+	public class Field : IDLiteBase
+	{
+		public List<Ball> balls;
+
+		public Field(List<Ball> balls)
+		{
+			this.balls = balls;
+		}
+
+		public Field(Dictionary<string, object> dict)
+		{
+			this.balls = GetList<Ball>(dict, "balls", (object o) => { return new Ball((Dictionary<string, object>)o); });
 		}
 	}
 
