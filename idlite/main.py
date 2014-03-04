@@ -14,8 +14,6 @@ def parse_args():
 
 def main():
     args = parse_args()
-    print(args.namespace)
-    print(args.files)
 
     spec = []
     for fn in args.files:
