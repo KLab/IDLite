@@ -115,7 +115,7 @@ def generate_type(w, t):
     fields = list(map(FieldWrapper, t.fields))
     # Begin
     w.writeln("[Serializable]")
-    w.writeln("public class " + t.name + " : IDLiteBase")
+    w.writeln("public partial class " + t.name + " : IDLiteBase")
     with w:
         # Field declaration
         for f in fields:
