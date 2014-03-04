@@ -1,8 +1,7 @@
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 from functools import partial
-import sys
 
-from idlite.types import List, Object, Class, Enum
+from idlite.types import List, Class, Enum
 
 
 def generate(spec, out):
@@ -15,7 +14,11 @@ def generate(spec, out):
 
 def generate_class(t, out):
     p = partial(print, file=out)
+    doc = t.doc
 
+    if doc:
+        for L in doc.splitlines():
+            p("//" + L)
     p("class %s {" % t.name)
     for f in t.fields:
         if f.enum:
@@ -29,6 +32,11 @@ def generate_class(t, out):
 
 def generate_enum(t, out):
     p = partial(print, file=out)
+    doc = t.doc
+
+    if doc:
+        for L in doc.splitlines():
+            p("//" + L)
 
     p("enum %s {" % t.name)
     L = ',\n    '.join("%s = %s" % t for t in t.values)
