@@ -163,7 +163,13 @@ def generate_type(w, t):
 def generate_enum(w, E):
     name = E.name
     values = E.values
+    doc = E.doc
 
+    if doc:
+        w.writeln("/// <summary>")
+        for L in doc.splitlines():
+            w.writeln("///" + L)
+        w.writeln("/// </summary>")
     w.writeln("public enum {0}", name)
     with w:
         sep = ',\n' + '\t' * w.indent

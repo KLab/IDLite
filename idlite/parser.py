@@ -63,7 +63,6 @@ def p_document(p):
         p[0] = p[1]
     elif len(p) == 3:
         p[0] = p[1] + '\n' + p[2]
-    print(p[0])
 
 
 def p_class(p):
@@ -71,13 +70,11 @@ def p_class(p):
     class : document class
           | CLASS ID '{' fields '}' ';'
     """
-    print(list(p))
     if len(p) == 3:
         cls = p[2]
         p[0] = cls._replace(doc=p[1])
     else:
         p[0] = Class(p[2], None, p[4])
-    print(p[0])
 
 
 def p_fields(p):
@@ -122,9 +119,13 @@ def p_field(p):
 
 def p_enum(p):
     """
-    enum : ENUM ID '{' enum_values '}' ';'
+    enum : document enum
+         | ENUM ID '{' enum_values '}' ';'
     """
-    p[0] = Enum(p[2], p[4])
+    if len(p) == 3:
+        p[0] = p[2]._replace(doc=p[1])
+    else:
+        p[0] = Enum(p[2], None, p[4])
 
 
 def p_enum_values(p):

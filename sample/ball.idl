@@ -1,3 +1,5 @@
+// ドキュメントコメント
+// 複数行書けます.
 enum Color {
     red = 1,
     green = 2,
@@ -6,10 +8,9 @@ enum Color {
 
 # 無視されるコメント
 
-// ドキュメントコメント
-// 複数行書けます.
+// ボール
 class Ball {
-    string owner;
+    string? owner;
     enum Color color;
     float x; # x座標.
     float y;
