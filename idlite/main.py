@@ -6,14 +6,16 @@ from idlite.parser import parser
 from idlite import unitygen, idlitegen
 
 
-def parse_args():
+def build_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--namespace', default='IDLite')
+    parser.add_argument('--output-type', default='unity')
     parser.add_argument('files', nargs='+')
-    return parser.parse_args()
+    return parser
 
 def main():
-    args = parse_args()
+    argparser = build_argparser()
+    args = argparser.parse_args()
 
     spec = []
     for fn in args.files:
@@ -21,4 +23,11 @@ def main():
             spec += parser.parse(f.read())
             parser.restart()
 
-    unitygen.generate(spec, sys.stdout, args.namespace)
+    if args.output_type == 'unity':
+        unitygen.generate(spec, sys.stdout, args.namespace)
+    elif args.output_type == 'idlite':
+        idlitegen.generate(spec, sys.stdout)
+    else:
+        sys.exit("""
+Unknown output type: %r
+Available types are: unity, idlite""" % args.output_type)

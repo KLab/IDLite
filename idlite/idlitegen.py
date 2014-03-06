@@ -1,44 +1,50 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from functools import partial
 
+from mako.template import Template
+
 from idlite.types import List, Class, Enum
 
 
 def generate(spec, out):
     for t in spec:
         if isinstance(t, Class):
-            generate_class(t, out)
+            out.write(_class_t.render(class_=t))
         elif isinstance(t, Enum):
-            generate_enum(t, out)
+            out.write(_enum_t.render(enum=t))
 
 
-def generate_class(t, out):
-    p = partial(print, file=out)
-    doc = t.doc
+_class_t = Template(
+"""
+% if class_.doc:
+    % for L in class_.doc.splitlines():
+//${L}
+    % endfor
+% endif
+class ${class_.name} {
+% for field in class_.fields:
+    % if field.enum:
+    enum ${field.type} ${field.name};
+    % elif isinstance(field.type, List):
+    List<${field.type.T}> ${field.name};
+    % else:
+    ${field.type} ${field.name};
+    % endif
+% endfor
+};
+""", format_exceptions=True, imports=["from idlite.types import List"])
 
-    if doc:
-        for L in doc.splitlines():
-            p("//" + L)
-    p("class %s {" % t.name)
-    for f in t.fields:
-        if f.enum:
-            p("    enum %s %s;" % (f.type, f.name))
-        elif isinstance(f.type, List):
-            p("    List<%s> %s;" % (f.type.T, f.name))
-        else:
-            p("    %s %s;" % (f.type, f.name))
-    p("};\n")
 
-
-def generate_enum(t, out):
-    p = partial(print, file=out)
-    doc = t.doc
-
-    if doc:
-        for L in doc.splitlines():
-            p("//" + L)
-
-    p("enum %s {" % t.name)
-    L = ',\n    '.join("%s = %s" % t for t in t.values)
-    p("    " + L)
-    p("};\n")
+_enum_t = Template(
+"""
+% if enum.doc:
+    % for L in enum.doc.splitlines():
+//${L}
+    % endfor
+% endif
+enum ${enum.name} {
+% for (name, value) in enum.values:
+    ${name} = ${value}${'' if loop.last else ','}
+% endfor
+};
+""", format_exceptions=True)
