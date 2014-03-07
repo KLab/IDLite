@@ -139,7 +139,7 @@ def generate_type(w, t):
         w.writeln("public {0}({1})", t.name, args)
         with w:
             for f in fields:
-                w.writeln("this.{0.csname} = {0.name};", f)
+                w.writeln("this.{0.csname} = {0.csname};", f)
         w.writeln('')
 
         # From dict
