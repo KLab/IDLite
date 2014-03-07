@@ -3,6 +3,7 @@ import sys
 
 from idlite.types import List, Object, Class, Enum
 
+
 def generate(spec, out, namespace):
     w = Writer(out)
     w.writeln("// This code is automatically generated.")
@@ -11,7 +12,6 @@ def generate(spec, out, namespace):
     w.writeln("using System.Collections.Generic;")
     w.writeln('')
     w.writeln('namespace %s' % namespace)
-    spec.sort(key=lambda x: x.name)
     with w:
         for def_ in spec:
             if isinstance(def_, Class):

@@ -3,7 +3,7 @@ import argparse
 import sys
 
 from idlite.parser import parser
-from idlite import unitygen, idlitegen
+from idlite import unitygen, idlitegen, types
 
 
 def build_argparser():
@@ -22,6 +22,9 @@ def main():
         with open(fn) as f:
             spec += parser.parse(f.read())
             parser.restart()
+
+    type_order = {types.Enum: 0, types.Class: 1}
+    spec.sort(key=lambda s: (type_order[type(s)], s.name))
 
     if args.output_type == 'unity':
         unitygen.generate(spec, sys.stdout, args.namespace)
