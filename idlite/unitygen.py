@@ -162,8 +162,15 @@ def generate_type(w, t):
                         f.type, f.nullable, f.enum)
                 w.writeln('this.{0.csname} = {1};', f, e)
 
-        #w.writeln('')
-        # TODO: ToDict
+        # ToString
+        w.writeln('')
+        w.writeln('public override string ToString()')
+        with w:
+            buf = 'return "%s(' % escape_reserved(t.name)
+            buf += ', '.join('{0.csname}=" + {0.csname} + "'.format(f) for f in fields)
+            buf += ')";'
+            w.writeln(buf)
+
     w.writeln('')
 
 
