@@ -11,6 +11,7 @@ def generate(spec, out, namespace):
     w.writeln("using System.Collections.Generic;")
     w.writeln('')
     w.writeln('namespace %s' % namespace)
+    spec.sort(key=lambda x: x.name)
     with w:
         for def_ in spec:
             if isinstance(def_, Class):
