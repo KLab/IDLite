@@ -42,15 +42,19 @@ IDL
 
     // ボール
     class Ball {
+        // ボールの持ち主
         string? owner;
+        // ボールの色
         enum Color color;
-        float x; # x座標.
+        // 座標
+        float x;
         float y;
     };
 
     class Field {
         List<Ball> balls;
     };
+
 
 生成されるコード
 ^^^^^^^^^^^^^^^^
@@ -75,14 +79,24 @@ IDL
                     blue = 3
             }
 
+
             /// <summary>
             /// ボール
             /// </summary>
             [Serializable]
             public partial class Ball : IDLiteBase
             {
+                    /// <summary>
+                    /// ボールの持ち主
+                    /// </summary>
                     public string owner;
+                    /// <summary>
+                    /// ボールの色
+                    /// </summary>
                     public Color color;
+                    /// <summary>
+                    /// 座標
+                    /// </summary>
                     public double x;
                     public double y;
 
@@ -96,7 +110,7 @@ IDL
 
                     public Ball(Dictionary<string, object> dict)
                     {
-                            this.owner = ToNullableString(GetItem(dict, "owner"));
+                            this.owner = ToString(GetItem(dict, "owner"));
                             this.color = (Color)ToInt(GetItem(dict, "color"));
                             this.x = ToDouble(GetItem(dict, "x"));
                             this.y = ToDouble(GetItem(dict, "y"));
