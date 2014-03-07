@@ -3,7 +3,6 @@ import sys
 
 from idlite.types import List, Object, Class, Enum
 
-
 def generate(spec, out, namespace):
     w = Writer(out)
     w.writeln("// This code is automatically generated.")
@@ -77,11 +76,11 @@ def cstype(t, nullable):
         elif t == Object:
             return "Dictionary<string, object>"
         else:
-            return t
+            return escape_reserved(t)
     elif isinstance(t, List):
         return "List<%s>" % (cstype(t.T, False))
     elif isinstance(t, Class):
-        return t.name
+        return escape_reserved(t.name)
     else:
         raise ValueError("Unknown type: " + repr(t))
 
@@ -105,6 +104,7 @@ def get_value(expr, type_name, nullable, enum=False):
 class FieldWrapper(object):
     def __init__(self, field):
         self.name = field.name
+        self.csname = escape_reserved(field.name)
         self.type = field.type
         self.cstype = cstype(field.type, field.nullable)
         self.nullable = field.nullable
@@ -122,7 +122,7 @@ def generate_type(w, t):
         w.writeln("/// </summary>")
     # Begin
     w.writeln("[Serializable]")
-    w.writeln("public partial class " + t.name + " : IDLiteBase")
+    w.writeln("public partial class " + escape_reserved(t.name) + " : IDLiteBase")
     with w:
         # Field declaration
         for f in fields:
@@ -131,15 +131,15 @@ def generate_type(w, t):
                 for L in f.doc.splitlines():
                     w.writeln("///" + L)
                 w.writeln("/// </summary>")
-            w.writeln("public {0.cstype} {0.name};", f)
+            w.writeln("public {0.cstype} {0.csname};", f)
         w.writeln('')
 
         # Handy Constructor
-        args = ", ".join("{0.cstype} {0.name}".format(f) for f in fields)
+        args = ", ".join("{0.cstype} {0.csname}".format(f) for f in fields)
         w.writeln("public {0}({1})", t.name, args)
         with w:
             for f in fields:
-                w.writeln("this.{0.name} = {0.name};", f)
+                w.writeln("this.{0.csname} = {0.name};", f)
         w.writeln('')
 
         # From dict
@@ -160,7 +160,7 @@ def generate_type(w, t):
                     e = get_value(
                         'GetItem(dict, "%s")' % f.name,
                         f.type, f.nullable, f.enum)
-                w.writeln('this.{0.name} = {1};', f, e)
+                w.writeln('this.{0.csname} = {1};', f, e)
 
         #w.writeln('')
         # TODO: ToDict
@@ -177,8 +177,96 @@ def generate_enum(w, E):
         for L in doc.splitlines():
             w.writeln("///" + L)
         w.writeln("/// </summary>")
-    w.writeln("public enum {0}", name)
+    w.writeln("public enum {0}", escape_reserved(name))
     with w:
         sep = ',\n' + '\t' * w.indent
-        w.writeln(sep.join("%s = %s" % v for v in values))
+        w.writeln(sep.join("%s = %s" % (escape_reserved(k),v) for (k,v) in values))
     w.writeln('')
+
+
+def escape_reserved(w):
+    if w in RESERVED_WORDS:
+        return w + '_'
+    return w
+
+
+RESERVED_WORDS = """
+abstract
+as
+base
+bool
+break
+byte
+case
+catch
+char
+checked
+class
+const
+continue
+decimal
+default
+delegate
+do
+double
+else
+enum
+event
+explicit
+extern
+false
+finally
+fixed
+float
+for
+foreach
+goto
+if
+implicit
+[in]
+in
+int
+interface
+internal
+is
+lock
+long
+namespace
+new
+null
+object
+operator
+[out]
+out
+override
+params
+private
+protected
+public
+readonly
+ref
+return
+sbyte
+sealed
+short
+sizeof
+stackalloc
+static
+String
+struct
+switch
+this
+throw
+true
+try
+typeof
+uint
+ulong
+unchecked
+unsafe
+ushort
+using
+virtual
+void
+volatile
+""".split()
