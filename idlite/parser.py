@@ -102,19 +102,23 @@ def p_type(p):
 
 def p_field(p):
     """
-    field : type ID ';'
+    field : document field
+          | type ID ';'
           | type '?' ID ';'
           | ENUM ID ID ';'
     """
-    if len(p) == 4:  # not nullable
-        p[0] = Field(p[1], p[2], False, False)
+    if len(p) == 3:
+        assert isinstance(p[2], Field)
+        p[0] = p[2]._replace(doc=p[1])
+    elif len(p) == 4:  # not nullable
+        p[0] = Field(p[1], p[2], False, False, None)
     elif len(p) == 5:
         if p[2] == '?':
-            p[0] = Field(p[1], p[3], True, False)
+            p[0] = Field(p[1], p[3], True, False, None)
         else:
-            p[0] = Field(p[2], p[3], False, True)
+            p[0] = Field(p[2], p[3], False, True, None)
     else:
-        raise Exception
+        raise Exception(str(p.slice))
 
 
 def p_enum(p):

@@ -23,6 +23,11 @@ _class_t = Template(
 % endif
 class ${class_.name} {
 % for field in class_.fields:
+    % if field.doc is not None:
+        % for L in field.doc.splitlines():
+    //${L}
+        % endfor
+    % endif
     % if field.enum:
     enum ${field.type} ${field.name};
     % elif isinstance(field.type, List):

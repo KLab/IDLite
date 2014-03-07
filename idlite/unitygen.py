@@ -109,11 +109,13 @@ class FieldWrapper(object):
         self.cstype = cstype(field.type, field.nullable)
         self.nullable = field.nullable
         self.enum = field.enum
+        self.doc = field.doc
 
 
 def generate_type(w, t):
     fields = list(map(FieldWrapper, t.fields))
     if t.doc:
+        w.writeln("")
         w.writeln("/// <summary>")
         for L in t.doc.splitlines():
             w.writeln("///"+ L)
@@ -124,6 +126,11 @@ def generate_type(w, t):
     with w:
         # Field declaration
         for f in fields:
+            if f.doc is not None:
+                w.writeln("/// <summary>")
+                for L in f.doc.splitlines():
+                    w.writeln("///" + L)
+                w.writeln("/// </summary>")
             w.writeln("public {0.cstype} {0.name};", f)
         w.writeln('')
 

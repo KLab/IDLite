@@ -10,9 +10,12 @@ enum Color {
 
 // ボール
 class Ball {
+    // ボールの持ち主
     string? owner;
+    // ボールの色
     enum Color color;
-    float x; # x座標.
+    // 座標
+    float x;
     float y;
 };
 
