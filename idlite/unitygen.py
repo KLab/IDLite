@@ -87,16 +87,17 @@ def cstype(t, nullable):
 
 
 def get_value(expr, type_name, nullable, enum=False):
-    if type_name in ['int', 'long', 'string', 'float', 'bool']:
+    if type_name == Object:
+        return "(Dictionary<string, object>)%s" % expr
+    elif type_name in ['int', 'long', 'string', 'float', 'bool']:
         #: :type: string
         t = type_name
         if t == 'float':
             t = 'double'
         return 'To%s%s(%s)' % (
             'Nullable' if nullable else '',
-            t[0].upper() + t[1:],
-            expr
-        )
+            t.title(),
+            expr)
     elif enum:
         return "(%s)ToInt(%s)" % (type_name, expr)
     else:
