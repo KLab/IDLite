@@ -94,12 +94,12 @@ def get_value(expr, type_name, nullable, enum=False):
         t = type_name
         if t == 'float':
             t = 'double'
-        return 'To%s%s(%s)' % (
+        return 'Parse%s%s(%s)' % (
             'Nullable' if nullable else '',
             t.title(),
             expr)
     elif enum:
-        return "(%s)ToInt(%s)" % (type_name, expr)
+        return "(%s)ParseInt(%s)" % (type_name, expr)
     else:
         return 'new %s((Dictionary<string, object>)%s)' % (type_name, expr)
 

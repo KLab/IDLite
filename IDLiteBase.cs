@@ -6,22 +6,22 @@ namespace IDLite
 {
 	public abstract class IDLiteBase
 	{
-		protected int ToInt(object o)
+		protected int ParseInt(object o)
 		{
-			return (int)ToLong(o);
+			return (int)ParseLong(o);
 		}
 
-		protected int? ToNullableInt(object o)
+		protected int? ParseNullableInt(object o)
 		{
-			return (int?)ToNullableLong(o);
+			return (int?)ParseNullableLong(o);
 		}
 
-		protected long ToLong(object o)
+		protected long ParseLong(object o)
 		{
-			return ToNullableLong(o).Value;
+			return ParseNullableLong(o).Value;
 		}
 
-		protected long? ToNullableLong(object o)
+		protected long? ParseNullableLong(object o)
 		{
 			if (o is long) {
 				return (long)o;
@@ -32,12 +32,12 @@ namespace IDLite
 			}
 		}
 
-		protected double ToDouble(object o)
+		protected double ParseDouble(object o)
 		{
-			return ToNullableDouble(o).Value;
+			return ParseNullableDouble(o).Value;
 		}
 
-		public static double? ToNullableDouble(object o)
+		public static double? ParseNullableDouble(object o)
 		{
 			if (o is long) {
 				return (double)(long)o;
@@ -48,12 +48,12 @@ namespace IDLite
 			}
 		}
 
-		protected string ToString(object o)
+		protected string ParseString(object o)
 		{
-			return ToNullableString(o);
+			return ParseNullableString(o);
 		}
 
-		protected string ToNullableString(object o)
+		protected string ParseNullableString(object o)
 		{
 			if (o is string) {
 				return (string)o;
@@ -62,12 +62,12 @@ namespace IDLite
 			}
 		}
 
-		protected bool ToBool(object o)
+		protected bool ParseBool(object o)
 		{
-			return ToNullableBool(o).Value;
+			return ParseNullableBool(o).Value;
 		}
 
-		protected bool? ToNullableBool(object o)
+		protected bool? ParseNullableBool(object o)
 		{
 			if (o is bool) {
 				return (bool)o;
