@@ -110,10 +110,15 @@ IDL
 
                     public Ball(Dictionary<string, object> dict)
                     {
-                            this.owner = ToString(GetItem(dict, "owner"));
-                            this.color = (Color)ToInt(GetItem(dict, "color"));
-                            this.x = ToDouble(GetItem(dict, "x"));
-                            this.y = ToDouble(GetItem(dict, "y"));
+                            this.owner = ParseNullableString(GetItem(dict, "owner"));
+                            this.color = (Color)ParseInt(GetItem(dict, "color"));
+                            this.x = ParseDouble(GetItem(dict, "x"));
+                            this.y = ParseDouble(GetItem(dict, "y"));
+                    }
+
+                    public override string ToString()
+                    {
+                            return "Ball(owner=" + owner + ", color=" + color + ", x=" + x + ", y=" + y + ")";
                     }
             }
 
@@ -130,6 +135,11 @@ IDL
                     public Field(Dictionary<string, object> dict)
                     {
                             this.balls = GetList<Ball>(dict, "balls", (object o) => { return new Ball((Dictionary<string, object>)o); });
+                    }
+
+                    public override string ToString()
+                    {
+                            return "Field(balls=" + balls + ")";
                     }
             }
 
