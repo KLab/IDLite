@@ -33,7 +33,7 @@ class ${class_.name} {
     % elif isinstance(field.type, List):
     List<${field.type.T}> ${field.name};
     % else:
-    ${field.type} ${field.name};
+    ${field.type}${'?' if field.nullable else ''} ${field.name};
     % endif
 % endfor
 };
