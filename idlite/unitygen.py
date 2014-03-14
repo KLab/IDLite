@@ -173,6 +173,26 @@ def generate_type(w, t):
             buf += ')";'
             w.writeln(buf)
 
+        # Serialize
+        w.writeln('')
+        w.writeln('public override Dictionary<string, object> Serialize()')
+        with w:
+            w.writeln('return new Dictionary<string, object>()')
+            with w:
+                for f in fields:
+                    if isinstance(f.type, List):
+                        if f.type.T in ['int', 'long', 'string', 'float', 'bool']:
+                            w.writeln('{"%s", %s},' % (f.name, f.csname))
+                        else:
+                            w.writeln('{"%s", SerializeList(%s)},' % (f.name, f.csname))
+                    elif f.enum:
+                        w.writeln('{"%s", (int) %s},' % (f.name, f.csname))
+                    elif f.type in ['int', 'long', 'string', 'float', 'bool', Object]:
+                        w.writeln('{"%s", %s},' % (f.name, f.csname))
+                    else:
+                        w.writeln('{"%s", %s.Serialize()},' % (f.name, f.csname))
+            w.writeln(';')
+
     w.writeln('')
 
 
