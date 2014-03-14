@@ -96,5 +96,16 @@ namespace IDLite
 				return null;
 			}
 		}
+
+		protected static List<object> SerializeList<T>(List<T> list) where T : IDLiteBase
+		{
+			var a = new List<object>();
+			foreach (var x in list) {
+				a.Add(x.Serialize());
+			}
+			return a;
+		}
+
+		public abstract Dictionary<string, object> Serialize();
 	}
 }
