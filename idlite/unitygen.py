@@ -101,7 +101,10 @@ def get_value(expr, type_name, nullable, enum=False):
     elif enum:
         return "(%s)ParseInt(%s)" % (type_name, expr)
     else:
-        return 'new %s((Dictionary<string, object>)%s)' % (type_name, expr)
+        return '%snew %s((Dictionary<string, object>)%s)' % (
+            ('%s == null ? null : ' % expr) if nullable else '',
+            type_name,
+            expr)
 
 class FieldWrapper(object):
     def __init__(self, field):
@@ -190,7 +193,10 @@ def generate_type(w, t):
                     elif f.type in ['int', 'long', 'string', 'float', 'bool', Object]:
                         w.writeln('{"%s", %s},' % (f.name, f.csname))
                     else:
-                        w.writeln('{"%s", %s.Serialize()},' % (f.name, f.csname))
+                        w.writeln('{"%s", %s%s.Serialize()},' % (
+                            f.name,
+                            ('%s == null ? null : ' % f.csname) if f.nullable else '',
+                            f.csname))
             w.writeln(';')
 
     w.writeln('')
