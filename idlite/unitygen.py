@@ -13,13 +13,10 @@ def generate(spec, out, namespace):
     w.writeln('')
     w.writeln('namespace %s' % namespace)
     with w:
-        for def_ in spec:
-            if isinstance(def_, Class):
-                generate_type(w, def_)
-            elif isinstance(def_, Enum):
-                generate_enum(w, def_)
-            else:
-                raise ValueError("Can't generater for %s" % (def_,))
+        for n in sorted(spec.enums):
+            generate_enum(w, spec.enums[n])
+        for n in sorted(spec.classes):
+            generate_type(w, spec.classes[n])
 
 
 class Writer(object):

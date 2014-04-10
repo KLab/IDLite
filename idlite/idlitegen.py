@@ -7,11 +7,10 @@ from idlite.types import List, Class, Enum
 
 
 def generate(spec, out):
-    for t in spec:
-        if isinstance(t, Class):
-            out.write(_class_t.render(class_=t))
-        elif isinstance(t, Enum):
-            out.write(_enum_t.render(enum=t))
+    for n in sorted(spec.enums):
+        out.write(_enum_t.render_unicode(enum=spec.enums[n]))
+    for n in sorted(spec.classes):
+        out.write(_class_t.render_unicode(class_=spec.classes[n]))
 
 
 _class_t = Template(
