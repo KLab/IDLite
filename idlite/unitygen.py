@@ -3,6 +3,9 @@ import sys
 
 from idlite.types import List, Object, Class, Enum
 
+if sys.version_info[0] == 3:
+    basestring = str
+
 
 def generate(spec, out, namespace):
     w = Writer(out)
@@ -66,7 +69,7 @@ class Writer(object):
 
 
 def cstype(t, nullable):
-    if isinstance(t, str):
+    if isinstance(t, basestring):
         if t == "float":
             return "double?" if nullable else "double"
         elif t in ["int", "long", "bool"]:

@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function
 import argparse
+import io
 import sys
 
 from idlite.parser import parser
@@ -21,7 +22,7 @@ def main():
 
     spec = Spec()
     for fn in args.files:
-        with open(fn) as f:
+        with io.open(fn, 'r') as f:
             for t in parser.parse(f.read()):
                 spec.add(t)
             parser.restart()

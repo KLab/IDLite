@@ -1,16 +1,20 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 from functools import partial
 
 from mako.template import Template
+import mako.exceptions
 
 from idlite.types import List, Class, Enum
 
 
 def generate(spec, out):
-    for n in sorted(spec.enums):
-        out.write(_enum_t.render_unicode(enum=spec.enums[n]))
-    for n in sorted(spec.classes):
-        out.write(_class_t.render_unicode(class_=spec.classes[n]))
+    try:
+        for n in sorted(spec.enums):
+            out.write(_enum_t.render_unicode(enum=spec.enums[n]))
+        for n in sorted(spec.classes):
+            out.write(_class_t.render_unicode(class_=spec.classes[n]))
+    except Exception:
+        print(mako.exceptions.text_error_template().render())
 
 
 _class_t = Template(
@@ -36,7 +40,7 @@ class ${class_.name} {
     % endif
 % endfor
 };
-""", format_exceptions=True, imports=["from idlite.types import List"])
+""", imports=["from idlite.types import List"])
 
 
 _enum_t = Template(
@@ -51,4 +55,4 @@ enum ${enum.name} {
     ${name} = ${value}${'' if loop.last else ','}
 % endfor
 };
-""", format_exceptions=True)
+""")
