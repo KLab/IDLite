@@ -5,7 +5,7 @@ with open('README.rst') as f:
     long_description = f.read()
 
 setup(name="idlite",
-      version="0.0.10",
+      version="0.0.11",
       packages=find_packages(),
       scripts=['bin/idlite'],
       install_requires=['ply', 'Mako'],
@@ -14,4 +14,4 @@ setup(name="idlite",
           "Programming Language :: Python :: 3.3",
           "Programming Language :: Python :: 2.7",
       ],
-      )
+)
