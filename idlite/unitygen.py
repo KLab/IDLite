@@ -6,6 +6,7 @@ from idlite.types import List, Object, Class, Enum
 
 def generate(spec, out, namespace):
     w = Writer(out)
+    w.writeln(u'\ufeff')
     w.writeln("// This code is automatically generated.")
     w.writeln("// Don't edit this file directly.")
     w.writeln("using System;")
