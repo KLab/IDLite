@@ -168,3 +168,9 @@ def p_error(p):
 start = 'spec'
 lexer = lex.lex(debug=DEBUG)
 parser = yacc.yacc(outputdir=__DIR__, debug=DEBUG, write_tables=False)
+
+
+def parse(f):
+    ret = parser.parse(f.read())
+    parser.restart()
+    return ret
